@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">Tetris</string>
+    <string name="left">←</string>
+    <string name="right">→</string>
+    <string name="down">↓</string>
+    <string name="change">🔃</string>
+    <string name="start">▶</string>
+    <string name="end">⏺</string>
+    <string name="restart">↩</string>
+    <string name="pause">⏸</string>
+    <string name="next_block">Next Block</string>
+</resources>
