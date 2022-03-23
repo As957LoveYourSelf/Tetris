@@ -10,6 +10,7 @@ import android.graphics.Point;
 import android.os.Handler;
 import android.os.Message;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
@@ -19,6 +20,8 @@ import androidx.annotation.NonNull;
 import com.example.tetris.R;
 import com.example.tetris.models.BoxBlock;
 import com.example.tetris.models.MapModel;
+
+import java.util.Arrays;
 
 
 public class GameController implements View.OnClickListener {
@@ -65,6 +68,7 @@ public class GameController implements View.OnClickListener {
         public void handleMessage(@NonNull Message msg) {
             super.handleMessage(msg);
             gameView.invalidate();
+            nextBlocView.invalidate();
         }
     };
 
@@ -151,6 +155,7 @@ public class GameController implements View.OnClickListener {
                 break;
         }
         gameView.invalidate();
+        nextBlocView.invalidate();
     }
     //初始化游戏视图
     public void initView(){
@@ -285,12 +290,13 @@ public class GameController implements View.OnClickListener {
 
     private void drawNextBox(Canvas canvas){
         Point[] nextbox = boxModel.getNextbox();
+        int nextboxSize = nextBlocView.getWidth() / 6;
         for (Point point : nextbox) {
             canvas.drawRect(
-                    point.x * boxSize,
-                    point.y * boxSize,
-                    (point.x+1) * boxSize,
-                    (point.y+1) * boxSize,
+                    (point.x-1) * nextboxSize,
+                    (point.y+1) * nextboxSize,
+                    point.x * nextboxSize,
+                    (point.y+2) * nextboxSize,
                     nextboxPaint);
         }
     }

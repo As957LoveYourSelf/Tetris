@@ -1,7 +1,9 @@
 package com.example.tetris.models;
 
 import android.graphics.Point;
+import android.util.Log;
 
+import java.util.Arrays;
 import java.util.Random;
 
 public class BoxBlock {
@@ -46,6 +48,8 @@ public class BoxBlock {
             this.box = nextbox;
         }
         nextbox = generateBox();
+        Log.e("this box:", Arrays.toString(this.box));
+        Log.e("next box:", Arrays.toString(nextbox));
         return this.box;
     }
 
