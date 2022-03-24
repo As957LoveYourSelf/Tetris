@@ -10,21 +10,22 @@ import android.graphics.Point;
 import android.os.Handler;
 import android.os.Message;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 
 import com.example.tetris.R;
 import com.example.tetris.models.BoxBlock;
 import com.example.tetris.models.MapModel;
-
-import java.util.Arrays;
+import com.example.tetris.models.ScoresModel;
 
 
 public class GameController implements View.OnClickListener {
+
+
 
     private final Activity activity;
     //游戏区域的宽和高
@@ -32,6 +33,8 @@ public class GameController implements View.OnClickListener {
     //游戏区域控件
     View gameView;
     View nextBlocView;
+    TextView sinceScores;
+    TextView maxScores;
     //暂停状态
     boolean isPause = false;
     //结束状态
@@ -46,6 +49,7 @@ public class GameController implements View.OnClickListener {
 
     private MapModel mapModel;
     private BoxBlock boxModel;
+    private ScoresModel scoresModel;
 
     int boxSize;
     private boolean[][] map;
@@ -69,6 +73,8 @@ public class GameController implements View.OnClickListener {
             super.handleMessage(msg);
             gameView.invalidate();
             nextBlocView.invalidate();
+            maxScores.invalidate();
+            sinceScores.invalidate();
         }
     };
 
@@ -135,17 +141,24 @@ public class GameController implements View.OnClickListener {
                     }
                 }
                 break;
+            case R.id.btnSlowDown:
+                if (!isPause && !isOver)
+                    boxModel.move(0, 1);
+                break;
             case R.id.btnRotate:
                 if (!isPause && !isOver)
-                    if (boxModel.getType() != 0)
-                        this.box = boxModel.rotate();
+                {
+                    Object[] objects = boxModel.rotate();
+                    boolean b = (boolean) objects[0];
+                    if (boxModel.getType() != 0 && b)
+                        this.box = (Point[]) objects[1];
+                }
                 break;
             case R.id.start:
                 startGame();
                 break;
             case R.id.stop:
-                if (!isPause)
-                    pauseGame();
+                pauseGame();
                 break;
             case R.id.restart:
                 restartGame();
@@ -158,6 +171,7 @@ public class GameController implements View.OnClickListener {
         nextBlocView.invalidate();
     }
     //初始化游戏视图
+    @SuppressLint("SetTextI18n")
     public void initView(){
         //初始化画笔
         linePaint = new Paint();
@@ -178,7 +192,7 @@ public class GameController implements View.OnClickListener {
         statePaint.setTextSize(100);
 
         nextboxPaint = new Paint();
-        nextboxPaint.setColor(Color.BLUE);
+        nextboxPaint.setColor(Color.BLACK);
         nextboxPaint.setAntiAlias(true);
 
         //游戏区域
@@ -211,6 +225,13 @@ public class GameController implements View.OnClickListener {
         nextBlocView.setLayoutParams(new FrameLayout.LayoutParams(-1, 200));
         nextBlocView.setBackgroundColor(Color.GRAY);
         nextBlockLayout.addView(nextBlocView);
+
+        //显示分数区域
+        maxScores = this.activity.findViewById(R.id.maxScore);
+        sinceScores = this.activity.findViewById(R.id.sinceScore);
+        scoresModel = new ScoresModel(maxScores.getContext());
+        maxScores.setText(scoresModel.getMaxScores()+"");
+        sinceScores.setText(0+"");
     }
     //初始化监听事件
     public void initListener(){
@@ -246,6 +267,7 @@ public class GameController implements View.OnClickListener {
     }
 
     //快速下落方法，以及堆积判断
+    @SuppressLint("SetTextI18n")
     private boolean moveJudge(){
         Object[] move = boxModel.move(0, 1);
         this.box = (Point[]) move[1];
@@ -258,7 +280,15 @@ public class GameController implements View.OnClickListener {
         //生成方块
         this.box = boxModel.createBox();
         //判断消行
-        this.map = mapModel.cleanLine();
+        Object[] objects = mapModel.cleanLine();
+        this.map = (boolean[][]) objects[0];
+        int dlines = (int) objects[1];
+        //加分
+        if (dlines != 0){
+            scoresModel.addScores(dlines, maxScores.getContext());
+            sinceScores.setText(scoresModel.getSinceScores()+"");
+            maxScores.setText(scoresModel.getMaxScores()+"");
+        }
         //判断游戏结束
         isOver = mapModel.checkOver(this.box);
         downThread.interrupt();

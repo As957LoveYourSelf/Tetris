@@ -2,11 +2,14 @@
     <string name="app_name">Tetris</string>
     <string name="left">←</string>
     <string name="right">→</string>
-    <string name="down">↓</string>
+    <string name="down">↓↓</string>
+    <string name="slowdown">↓</string>
     <string name="change">🔃</string>
     <string name="start">▶</string>
     <string name="end">⏺</string>
     <string name="restart">↩</string>
     <string name="pause">⏸</string>
     <string name="next_block">Next Block</string>
+    <string name="maxScores">最高分数</string>
+    <string name="sinceScores">当前分数</string>
 </resources>

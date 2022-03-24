@@ -1,9 +1,6 @@
 package com.example.tetris.models;
 
 import android.graphics.Point;
-import android.util.Log;
-
-import java.util.Arrays;
 import java.util.Random;
 
 public class BoxBlock {
@@ -48,8 +45,6 @@ public class BoxBlock {
             this.box = nextbox;
         }
         nextbox = generateBox();
-        Log.e("this box:", Arrays.toString(this.box));
-        Log.e("next box:", Arrays.toString(nextbox));
         return this.box;
     }
 
@@ -116,12 +111,12 @@ public class BoxBlock {
     }
 
 
-    public Point[] rotate(){
+    public Object[] rotate(){
         for (Point point : box) {
             int tempx = -point.y + box[0].y + box[0].x;
             int tempy = point.x - box[0].x + box[0].y;
             if (map.checkBoundary(tempx, tempy)){
-                return this.box;
+                return new Object[]{false};
             }
         }
         for (Point point : box) {
@@ -130,6 +125,6 @@ public class BoxBlock {
             point.x = tempx;
             point.y = tempy;
         }
-        return this.box;
+        return new Object[]{true, this.box};
     }
 }

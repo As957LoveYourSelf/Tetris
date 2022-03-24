@@ -5,31 +5,27 @@ import android.graphics.Point;
 public class MapModel {
     //地图
     private final boolean [][] map;
-    private final int length;
 
     public MapModel(boolean [][] map){
         this.map = map;
-        length = this.map.length;
     }
 
     public boolean[][] getMap() {
         return map;
     }
 
-    public int getLength() {
-        return length;
-    }
-
     //消行操作
-    public boolean[][] cleanLine(){
+    public Object[] cleanLine(){
+        int l = 0;
         for (int y = map[0].length-1; y > 0; y--){
             if (checkCleanLine(y)){
                 //执行消行
                 deleteLine(y);
+                l++;
                 y++;
             }
         }
-        return this.map;
+        return new Object[]{this.map, l};
     }
 
     private void deleteLine(int y){
@@ -72,6 +68,4 @@ public class MapModel {
     public boolean checkBoundary(int x, int y){
         return (x<0||y<0||x>=map.length||y>=map[0].length|| map[x][y]);
     }
-
-
 }
