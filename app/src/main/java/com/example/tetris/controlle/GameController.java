@@ -118,6 +118,8 @@ public class GameController implements View.OnClickListener {
     //重新开始
     private void restartGame(){
         this.map = mapModel.cleanMap();
+        this.isPause = false;
+        this.isOver = false;
     }
 
     @SuppressLint("NonConstantResourceId")
@@ -130,7 +132,7 @@ public class GameController implements View.OnClickListener {
                 break;
             case R.id.btnRight:
                 if (!isPause && !isOver)
-                    boxModel.move(1,0);
+                    this.box = (Point[]) boxModel.move(1,0)[1];
                 break;
             case R.id.btnDown:
                 if (!isPause && !isOver && this.box.length != 0){
@@ -143,7 +145,7 @@ public class GameController implements View.OnClickListener {
                 break;
             case R.id.btnSlowDown:
                 if (!isPause && !isOver)
-                    boxModel.move(0, 1);
+                    this.box = (Point[]) boxModel.move(0, 1)[1];
                 break;
             case R.id.btnRotate:
                 if (!isPause && !isOver)
@@ -238,6 +240,7 @@ public class GameController implements View.OnClickListener {
         activity.findViewById(R.id.btnLeft).setOnClickListener(this);
         activity.findViewById(R.id.btnRight).setOnClickListener(this);
         activity.findViewById(R.id.btnDown).setOnClickListener(this);
+        activity.findViewById(R.id.btnSlowDown).setOnClickListener(this);
         activity.findViewById(R.id.btnRotate).setOnClickListener(this);
         activity.findViewById(R.id.start).setOnClickListener(this);
         activity.findViewById(R.id.stop).setOnClickListener(this);
