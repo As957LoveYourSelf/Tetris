@@ -1,17 +1,42 @@
 package com.example.tetris.models;
 
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.graphics.Point;
+import android.view.View;
 
 public class MapModel {
     //地图
     private final boolean [][] map;
 
+    private final Paint linePaint;
+    private final Paint mapPaint;
+    private final Paint statePaint;
+
     public MapModel(boolean [][] map){
         this.map = map;
+
+        linePaint = new Paint();
+        linePaint.setColor(Color.GRAY);
+        linePaint.setAntiAlias(true);
+
+        mapPaint = new Paint();
+        mapPaint.setColor(Color.LTGRAY);
+        mapPaint.setAntiAlias(true);
+
+        statePaint = new Paint();
+        statePaint.setColor(Color.RED);
+        statePaint.setAntiAlias(true);
+        statePaint.setTextSize(100);
     }
 
     public boolean[][] getMap() {
         return map;
+    }
+
+    public int getLength(){
+        return this.map.length;
     }
 
     //消行操作
@@ -46,13 +71,12 @@ public class MapModel {
         return true;
     }
 
-    public boolean[][] cleanMap(){
+    public void cleanMap(){
         for (int x = 0; x < map.length; x++){
             for (int y = 0; y < map[0].length; y++){
                 map[x][y] = false;
             }
         }
-        return this.map;
     }
 
 
@@ -67,5 +91,46 @@ public class MapModel {
     //边界判断
     public boolean checkBoundary(int x, int y){
         return (x<0||y<0||x>=map.length||y>=map[0].length|| map[x][y]);
+    }
+
+    //==============================================================================================
+    // Draw Block
+    //==============================================================================================
+    public void drawMap(Canvas canvas, int boxSize){
+        //地图更新（堆积）
+        for (int x = 0; x < map.length; x++){
+            for (int y = 0; y < map[0].length; y++){
+                if (map[x][y]){
+                    canvas.drawRect(x*boxSize, y*boxSize, (x+1)*boxSize, (y+1)*boxSize, mapPaint);
+                }
+            }
+        }
+    }
+
+    public void drawMapLine(Canvas canvas, boolean openGuideLine, int boxSize, View gameView){
+        if (openGuideLine){
+            //地图辅助线
+            for (int x = 0; x < map.length; x++){
+                canvas.drawLine(x*boxSize, 0, x*boxSize, gameView.getHeight(),linePaint);
+            }
+            for (int y = 0; y < map[0].length; y++) {
+                canvas.drawLine(0, y*boxSize, gameView.getWidth(),y*boxSize, linePaint);
+            }
+        }
+    }
+
+    public void drawGameState(Canvas canvas, boolean isPause, boolean isOver, View gameView){
+        if (isPause&&!isOver){
+            canvas.drawText("Pausing",
+                    (gameView.getWidth()-statePaint.measureText("Pausing"))/2,
+                    gameView.getHeight()/2,
+                    statePaint);
+        }
+        if (isOver){
+            canvas.drawText("Game Over!",
+                    (gameView.getWidth()-statePaint.measureText("Game Over!"))/2,
+                    gameView.getHeight()/2,
+                    statePaint);
+        }
     }
 }
