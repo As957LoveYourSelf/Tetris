@@ -36,4 +36,8 @@ public class ScoresModel {
     public int getMaxScores() {
         return maxScores;
     }
+
+    public void setSinceScores(int sinceScores) {
+        this.sinceScores = sinceScores;
+    }
 }

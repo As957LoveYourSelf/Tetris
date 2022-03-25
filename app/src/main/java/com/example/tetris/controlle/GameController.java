@@ -12,6 +12,7 @@ import android.os.Message;
 import android.util.DisplayMetrics;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
@@ -25,16 +26,25 @@ import com.example.tetris.models.ScoresModel;
 
 public class GameController implements View.OnClickListener {
 
-
-
     private final Activity activity;
+    //==============================================================================================
+    // Values
+    //==============================================================================================
     //游戏区域的宽和高
     private int xWidth, xHeight;
+
+    private boolean gameGoing = false;
+    private boolean openGuideLine = true;
+
     //游戏区域控件
     View gameView;
     View nextBlocView;
     TextView sinceScores;
     TextView maxScores;
+
+    Button start;
+    Button lineGuide;
+
     //暂停状态
     boolean isPause = false;
     //结束状态
@@ -65,19 +75,65 @@ public class GameController implements View.OnClickListener {
 
     //方块下落速度（间隔ms）、线程
     int SPEED = 1000;
+    //==============================================================================================
+    // Thread
+    //==============================================================================================
     private Thread downThread = null;
     @SuppressLint("HandlerLeak")
     public Handler handler = new Handler(){
         @Override
         public void handleMessage(@NonNull Message msg) {
             super.handleMessage(msg);
-            gameView.invalidate();
-            nextBlocView.invalidate();
-            maxScores.invalidate();
-            sinceScores.invalidate();
+            if (msg.obj.equals("UpdateGame")){
+                gameView.invalidate();
+            }
+            if (msg.obj.equals("maxS")){
+               maxScores.invalidate();
+            }
+            if (msg.obj.equals("sinceS"))
+            {
+                sinceScores.invalidate();
+            }
+            if (msg.obj.equals("gamePause")){
+                if (gameGoing){
+                    start.setText("继续");
+                }
+                else {
+                    start.setText("开始游戏");
+                }
+                isPause = true;
+                start.invalidate();
+                gameView.invalidate();
+            }
+            if (msg.obj.equals("gameStart")){
+                start.setText("暂停");
+                gameGoing = true;
+                isPause = false;
+                start.invalidate();
+                gameView.invalidate();
+            }
+            if (msg.obj.equals("gameContinue")){
+                start.setText("暂停");
+                gameView.invalidate();
+            }
+            if (msg.obj.equals("restart")){
+                gameView.invalidate();
+            }
+            if (msg.obj.equals("guideLine")){
+                if (openGuideLine){
+                    lineGuide.setText("辅助线-开");
+                }
+                else {
+                    lineGuide.setText("辅助线-关");
+                }
+                openGuideLine = !openGuideLine;
+                gameView.invalidate();
+            }
         }
     };
-
+    //==============================================================================================
+    // Game Control
+    //==============================================================================================
     //开始游戏
     private void startGame(){
         //生成方块
@@ -96,19 +152,21 @@ public class GameController implements View.OnClickListener {
                         if (isOver||isPause)
                             continue;
                         moveJudge();
-                        handler.sendEmptyMessage(0);
+                        Message msg = new Message();
+                        msg.obj = "UpdateGame";
+                        handler.sendMessage(msg);
                     }
                 }
             };
             downThread.start();
         }
-        this.map = mapModel.cleanMap();
+        map = mapModel.cleanMap();
         isOver = false;
-        isPause = false;
+        nextBlocView.invalidate();
     }
     //游戏结束
     private void endGame(){
-
+        activity.closeContextMenu();
     }
 
     //游戏暂停
@@ -117,9 +175,20 @@ public class GameController implements View.OnClickListener {
     }
     //重新开始
     private void restartGame(){
-        this.map = mapModel.cleanMap();
+        scoresModel.setSinceScores(0);
         this.isPause = false;
         this.isOver = false;
+        this.map = mapModel.cleanMap();
+        Message msg = new Message();
+        msg.obj = "restart";
+        handler.sendMessage(msg);
+        startGame();
+    }
+
+    private void lineGuideController() {
+        Message msg = new Message();
+        msg.obj = "guideLine";
+        handler.sendMessage(msg);
     }
 
     @SuppressLint("NonConstantResourceId")
@@ -157,10 +226,22 @@ public class GameController implements View.OnClickListener {
                 }
                 break;
             case R.id.start:
-                startGame();
-                break;
-            case R.id.stop:
-                pauseGame();
+                Message msg = new Message();
+                if (!isPause && !gameGoing || start.getText().equals("开始游戏")){
+                    msg.obj = "gameStart";
+                    handler.sendMessage(msg);
+                    startGame();
+                }
+                else if (start.getText().equals("暂停")){
+                    msg.obj = "gamePause";
+                    handler.sendMessage(msg);
+                    pauseGame();
+                }
+                else if (start.getText().equals("继续")){
+                    msg.obj = "gameContinue";
+                    handler.sendMessage(msg);
+                    pauseGame();
+                }
                 break;
             case R.id.restart:
                 restartGame();
@@ -168,10 +249,18 @@ public class GameController implements View.OnClickListener {
             case R.id.end:
                 endGame();
                 break;
+            case R.id.openGuideLine:
+                lineGuideController();
+                break;
+
         }
-        gameView.invalidate();
-        nextBlocView.invalidate();
     }
+
+
+    //==============================================================================================
+    // Init Block
+    //==============================================================================================
+
     //初始化游戏视图
     @SuppressLint("SetTextI18n")
     public void initView(){
@@ -234,6 +323,9 @@ public class GameController implements View.OnClickListener {
         scoresModel = new ScoresModel(maxScores.getContext());
         maxScores.setText(scoresModel.getMaxScores()+"");
         sinceScores.setText(0+"");
+
+        start = activity.findViewById(R.id.start);
+        lineGuide = activity.findViewById(R.id.openGuideLine);
     }
     //初始化监听事件
     public void initListener(){
@@ -243,8 +335,8 @@ public class GameController implements View.OnClickListener {
         activity.findViewById(R.id.btnSlowDown).setOnClickListener(this);
         activity.findViewById(R.id.btnRotate).setOnClickListener(this);
         activity.findViewById(R.id.start).setOnClickListener(this);
-        activity.findViewById(R.id.stop).setOnClickListener(this);
         activity.findViewById(R.id.restart).setOnClickListener(this);
+        activity.findViewById(R.id.openGuideLine).setOnClickListener(this);
     }
 
     //初始化游戏数据
@@ -262,6 +354,9 @@ public class GameController implements View.OnClickListener {
         box = this.boxModel.getBox();
     }
 
+    //==============================================================================================
+    // Util Block
+    //==============================================================================================
     private static int getScreenWidth(Context context){
         WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
         DisplayMetrics dm = new DisplayMetrics();
@@ -291,13 +386,22 @@ public class GameController implements View.OnClickListener {
             scoresModel.addScores(dlines, maxScores.getContext());
             sinceScores.setText(scoresModel.getSinceScores()+"");
             maxScores.setText(scoresModel.getMaxScores()+"");
+            Message msg = new Message();
+            msg.obj = "sinceS";
+            handler.sendMessage(msg);
+            Message msg1 = new Message();
+            msg1.obj = "maxS";
+            handler.sendMessage(msg1);
         }
         //判断游戏结束
         isOver = mapModel.checkOver(this.box);
+        gameGoing = !isOver;
         downThread.interrupt();
         return false;
     }
-
+    //==============================================================================================
+    // Draw Block
+    //==============================================================================================
     private void drawMap(Canvas canvas){
         //地图更新（堆积）
         for (int x = 0; x < map.length; x++){
@@ -335,12 +439,14 @@ public class GameController implements View.OnClickListener {
     }
 
     private void drawMapLine(Canvas canvas){
-        //地图辅助线
-        for (int x = 0; x < map.length; x++){
-            canvas.drawLine(x*boxSize, 0, x*boxSize, gameView.getHeight(),linePaint);
-        }
-        for (int y = 0; y < map[0].length; y++) {
-            canvas.drawLine(0, y*boxSize, gameView.getWidth(),y*boxSize, linePaint);
+        if (openGuideLine){
+            //地图辅助线
+            for (int x = 0; x < map.length; x++){
+                canvas.drawLine(x*boxSize, 0, x*boxSize, gameView.getHeight(),linePaint);
+            }
+            for (int y = 0; y < map[0].length; y++) {
+                canvas.drawLine(0, y*boxSize, gameView.getWidth(),y*boxSize, linePaint);
+            }
         }
     }
 

@@ -84,17 +84,19 @@
                 />
 
             <Button
+                android:id="@+id/openGuideLine"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/guideLine"
+                />
+
+            <Button
                 android:id="@+id/end"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/end"
                 />
 
-            <Button
-                android:id="@+id/stop"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/pause"/>
 
             <Button
                 android:id="@+id/restart"
