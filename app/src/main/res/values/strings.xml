@@ -13,4 +13,5 @@
     <string name="maxScores">最高分数</string>
     <string name="sinceScores">当前分数</string>
     <string name="guideLine">辅助线-关</string>
+    <string name="speed">游戏速度-慢</string>
 </resources>

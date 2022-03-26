@@ -28,7 +28,7 @@ public class MapModel {
         statePaint = new Paint();
         statePaint.setColor(Color.RED);
         statePaint.setAntiAlias(true);
-        statePaint.setTextSize(100);
+        statePaint.setTextSize(150);
     }
 
     public boolean[][] getMap() {
@@ -121,14 +121,14 @@ public class MapModel {
 
     public void drawGameState(Canvas canvas, boolean isPause, boolean isOver, View gameView){
         if (isPause&&!isOver){
-            canvas.drawText("Pausing",
-                    (gameView.getWidth()-statePaint.measureText("Pausing"))/2,
+            canvas.drawText("游戏暂停",
+                    (gameView.getWidth()-statePaint.measureText("游戏暂停"))/2,
                     gameView.getHeight()/2,
                     statePaint);
         }
         if (isOver){
-            canvas.drawText("Game Over!",
-                    (gameView.getWidth()-statePaint.measureText("Game Over!"))/2,
+            canvas.drawText("游戏结束!",
+                    (gameView.getWidth()-statePaint.measureText("游戏结束!"))/2,
                     gameView.getHeight()/2,
                     statePaint);
         }

@@ -10,38 +10,38 @@ public class ColorModel {
             case 0:
                 // O O
                 // O O
-                color = "#784315";
+                color = "#ECAD9E";
                 break;
             case 1:
                 // O
                 // O O O
-                color = "#F2F051";
+                color = "#F4606C";
                 break;
             case 2:
                 // O O O O
-                color = "#3282F6";
+                color = "#19CAAD";
                 break;
             case 3:
                 //     O
                 // O O O
-                color = "#8E403A";
+                color = "#D6D5B7";
                 break;
             case 4:
                 //   O
                 // O O O
-                color = "#732BF5";
+                color = "#BEEDC7";
                 break;
             case 5:
                 //   O
                 // O O
                 // O
-                color = "#F09B59";
+                color = "#5E78F4";
                 break;
             case 6:
                 // O
                 // O O
                 //   O
-                color = "#DB3022";
+                color = "#D1BA74";
                 break;
         }
         return color;

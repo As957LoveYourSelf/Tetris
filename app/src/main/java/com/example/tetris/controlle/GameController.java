@@ -2,10 +2,12 @@ package com.example.tetris.controlle;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
@@ -38,6 +40,7 @@ public class GameController implements View.OnClickListener {
 
     Button start;
     Button lineGuide;
+    Button speedBtn;
 
     //暂停状态
     boolean isPause = false;
@@ -58,7 +61,7 @@ public class GameController implements View.OnClickListener {
     }
 
     //方块下落速度（间隔ms）、线程
-    int SPEED = 1000;
+    private static int SPEED = 1000;
 
     //==============================================================================================
     // Thread
@@ -100,7 +103,16 @@ public class GameController implements View.OnClickListener {
     }
     //游戏结束
     private void endGame(){
-
+        isPause = true;
+        new AlertDialog.Builder(this.activity)
+                .setTitle("结束游戏")
+                .setMessage("确定结束游戏嘛？")
+                .setNegativeButton("是", (dialogInterface, i) -> activity.finish())
+                .setPositiveButton("否", (dialogInterface, i) -> {
+                    isPause = false;
+                    gameView.invalidate();
+                })
+                .show();
     }
     //重新开始
     private void restartGame(){
@@ -190,8 +202,29 @@ public class GameController implements View.OnClickListener {
             case R.id.openGuideLine:
                 lineGuideController();
                 break;
+            case R.id.speed:
+                changeSpeed();
+                break;
         }
         gameView.invalidate();
+    }
+
+    private void changeSpeed() {
+        String str = speedBtn.getText().toString();
+        if (str.equals("游戏速度-慢")){
+            speedBtn.setText("游戏速度-中");
+            SPEED = 800;
+        }
+        if (str.equals("游戏速度-中")){
+            speedBtn.setText("游戏速度-快");
+            SPEED = 500;
+        }
+        if (str.equals("游戏速度-快")){
+            speedBtn.setText("游戏速度-慢");
+            SPEED = 1000;
+        }
+        speedBtn.invalidate();
+        Log.e("Speed", SPEED+"");
     }
 
 
@@ -217,6 +250,7 @@ public class GameController implements View.OnClickListener {
         sinceScores = this.activity.findViewById(R.id.sinceScore);
         start = activity.findViewById(R.id.start);
         lineGuide = activity.findViewById(R.id.openGuideLine);
+        speedBtn = activity.findViewById(R.id.speed);
     }
 
     //2. 初始化游戏视图
@@ -265,6 +299,8 @@ public class GameController implements View.OnClickListener {
         activity.findViewById(R.id.start).setOnClickListener(this);
         activity.findViewById(R.id.restart).setOnClickListener(this);
         activity.findViewById(R.id.openGuideLine).setOnClickListener(this);
+        activity.findViewById(R.id.end).setOnClickListener(this);
+        activity.findViewById(R.id.speed).setOnClickListener(this);
     }
 
 
