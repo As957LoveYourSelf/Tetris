@@ -5,16 +5,12 @@ import android.app.Activity;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.os.Handler;
-import android.os.Message;
 import android.util.DisplayMetrics;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.TextView;
-
-import androidx.annotation.NonNull;
 
 import com.example.tetris.R;
 import com.example.tetris.models.BoxBlock;
@@ -68,6 +64,7 @@ public class GameController implements View.OnClickListener {
     // Thread
     //==============================================================================================
     private Thread downThread = null;
+
     //==============================================================================================
     // Game Control
     //==============================================================================================
@@ -75,6 +72,10 @@ public class GameController implements View.OnClickListener {
     private void startGame(){
         //生成方块
         boxModel.createBox();
+        mapModel.cleanMap();
+        isOver = false;
+        gameView.invalidate();
+        nextBlocView.invalidate();
         if (downThread == null){
             downThread = new Thread(){
                 @Override
@@ -89,30 +90,27 @@ public class GameController implements View.OnClickListener {
                         if (isOver||isPause)
                             continue;
                         boxModel.moveJudge(mapModel,scoresModel, maxScores, sinceScores);
+                        isOver = mapModel.checkOver(boxModel.getBox());
                         gameView.invalidate();
                     }
                 }
             };
             downThread.start();
         }
-        mapModel.cleanMap();
-        isOver = false;
     }
     //游戏结束
     private void endGame(){
-        this.activity.closeContextMenu();
-    }
 
-    //游戏暂停
-    private void pauseGame(){
-        isPause = !isPause;
     }
     //重新开始
     private void restartGame(){
         scoresModel.setSinceScores(0);
         this.isPause = false;
         this.isOver = false;
+        gameGoing = true;
         mapModel.cleanMap();
+        start.setText("暂停");
+        start.invalidate();
         startGame();
     }
 
@@ -159,14 +157,14 @@ public class GameController implements View.OnClickListener {
                 }
                 break;
             case R.id.start:
-                Message msg = new Message();
+                if (isOver)
+                    break;
                 if (!isPause && !gameGoing || start.getText().equals("开始游戏")){
+                    startGame();
                     start.setText("暂停");
                     gameGoing = true;
                     isPause = false;
                     start.invalidate();
-                    gameView.invalidate();
-                    startGame();
                 }
                 else if (start.getText().equals("暂停")){
                     if (gameGoing){
@@ -177,13 +175,10 @@ public class GameController implements View.OnClickListener {
                     }
                     isPause = true;
                     start.invalidate();
-                    gameView.invalidate();
-                    pauseGame();
                 }
                 else if (start.getText().equals("继续")){
+                    isPause = false;
                     start.setText("暂停");
-                    gameView.invalidate();
-                    pauseGame();
                 }
                 break;
             case R.id.restart:
@@ -196,6 +191,7 @@ public class GameController implements View.OnClickListener {
                 lineGuideController();
                 break;
         }
+        gameView.invalidate();
     }
 
 
@@ -232,9 +228,9 @@ public class GameController implements View.OnClickListener {
             protected void onDraw(Canvas canvas) {
                 super.onDraw(canvas);
                 mapModel.drawMap(canvas, boxModel.getBoxSize());
+                boxModel.drawBox(canvas);
                 mapModel.drawMapLine(canvas, openGuideLine, boxModel.getBoxSize(), gameView);
                 mapModel.drawGameState(canvas, isPause, isOver, gameView);
-                boxModel.drawBox(canvas);
             }
         };
         //实例化游戏区域

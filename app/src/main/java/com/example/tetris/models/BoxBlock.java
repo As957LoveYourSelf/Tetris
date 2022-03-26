@@ -9,6 +9,7 @@ import android.os.Message;
 import android.view.View;
 import android.widget.TextView;
 
+import java.util.Arrays;
 import java.util.Random;
 
 public class BoxBlock {
@@ -76,7 +77,9 @@ public class BoxBlock {
         else {
             this.box = nextbox;
         }
+        changeBoxColor();
         nextbox = generateBox();
+        changeNextBoxColor();
     }
 
     private Point[] generateBox(){
@@ -142,6 +145,12 @@ public class BoxBlock {
 
 
     public void rotate(MapModel map){
+        if (Arrays.equals(
+                box,
+                new Point[]{new Point(4, 0), new Point(4, 1), new Point(5, 0), new Point(5, 1)})
+        ){
+            return;
+        }
         for (Point point : box) {
             int tempx = -point.y + box[0].y + box[0].x;
             int tempy = point.x - box[0].x + box[0].y;
@@ -180,11 +189,12 @@ public class BoxBlock {
                     (point.y+2) * nextboxSize,
                     nextboxPaint);
         }
+        nextBlocView.invalidate();
     }
 
     //快速下落方法，以及堆积判断
     @SuppressLint("SetTextI18n")
-    public boolean moveJudge(MapModel map, ScoresModel scoresModel, View maxScores, View  sinceScores){
+    public boolean moveJudge(MapModel map, ScoresModel scoresModel, TextView maxScores, TextView  sinceScores){
         if (move(0, 1, map)){
             return true;
         }
@@ -199,10 +209,23 @@ public class BoxBlock {
         //加分
         if (dlines != 0){
             scoresModel.addScores(dlines, maxScores.getContext());
+            sinceScores.setText(scoresModel.getSinceScores()+"");
+            maxScores.setText(scoresModel.getMaxScores()+"");
             maxScores.invalidate();
             sinceScores.invalidate();
         }
         return false;
     }
 
+    public void changeBoxColor(){
+        ColorModel colorModel = new ColorModel();
+        String color = colorModel.switchBoxColor(type);
+        boxPaint.setColor(Color.parseColor(color));
+    }
+
+    public void changeNextBoxColor(){
+        ColorModel colorModel = new ColorModel();
+        String color = colorModel.switchBoxColor(type);
+        nextboxPaint.setColor(Color.parseColor(color));
+    }
 }
