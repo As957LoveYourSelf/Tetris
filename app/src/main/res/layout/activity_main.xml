@@ -55,6 +55,7 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:textColor="@color/cardview_dark_background"
                     android:text="@string/maxScores"
                     android:gravity="center"/>
 
@@ -62,10 +63,12 @@
                     android:id="@+id/maxScore"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:textColor="@color/cardview_dark_background"
                     android:gravity="center"/>
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:textColor="@color/cardview_dark_background"
                     android:text="@string/sinceScores"
                     android:gravity="center"/>
 
@@ -73,6 +76,7 @@
                     android:id="@+id/sinceScore"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:textColor="@color/cardview_dark_background"
                     android:gravity="center"/>
             </LinearLayout>
 

@@ -5,9 +5,12 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Point;
+import android.media.SoundPool;
 import android.os.Message;
 import android.view.View;
 import android.widget.TextView;
+
+import com.example.tetris.SoundPoolUtil;
 
 import java.util.Arrays;
 import java.util.Random;
@@ -194,7 +197,7 @@ public class BoxBlock {
 
     //快速下落方法，以及堆积判断
     @SuppressLint("SetTextI18n")
-    public boolean moveJudge(MapModel map, ScoresModel scoresModel, TextView maxScores, TextView  sinceScores){
+    public boolean moveJudge(MapModel map, ScoresModel scoresModel, TextView maxScores, TextView  sinceScores, SoundPoolUtil soundPool){
         if (move(0, 1, map)){
             return true;
         }
@@ -208,6 +211,15 @@ public class BoxBlock {
         int dlines = (int) objects[1];
         //加分
         if (dlines != 0){
+            if (dlines == 1){
+                soundPool.play(2);
+            }
+            else if (dlines == 2){
+                soundPool.play(3);
+            }
+            else{
+                soundPool.play(4);
+            }
             scoresModel.addScores(dlines, maxScores.getContext());
             sinceScores.setText(scoresModel.getSinceScores()+"");
             maxScores.setText(scoresModel.getMaxScores()+"");

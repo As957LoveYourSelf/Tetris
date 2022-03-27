@@ -13,8 +13,10 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.tetris.R;
+import com.example.tetris.SoundPoolUtil;
 import com.example.tetris.models.BoxBlock;
 import com.example.tetris.models.MapModel;
 import com.example.tetris.models.ScoresModel;
@@ -51,6 +53,7 @@ public class GameController implements View.OnClickListener {
     private MapModel mapModel;
     private BoxBlock boxModel;
     private ScoresModel scoresModel;
+    private SoundPoolUtil soundPoolUtil;
 
     //游戏区域
     FrameLayout framelayout;
@@ -92,7 +95,7 @@ public class GameController implements View.OnClickListener {
                         }
                         if (isOver||isPause)
                             continue;
-                        boxModel.moveJudge(mapModel,scoresModel, maxScores, sinceScores);
+                        boxModel.moveJudge(mapModel,scoresModel, maxScores, sinceScores, soundPoolUtil);
                         isOver = mapModel.checkOver(boxModel.getBox());
                         gameView.invalidate();
                     }
@@ -140,6 +143,7 @@ public class GameController implements View.OnClickListener {
     @SuppressLint("NonConstantResourceId")
     @Override
     public void onClick(View v) {
+        soundPoolUtil.play(1);
         switch (v.getId()){
             case R.id.btnLeft:
                 if (!isPause && !isOver)
@@ -152,7 +156,7 @@ public class GameController implements View.OnClickListener {
             case R.id.btnDown:
                 if (!isPause && !isOver && boxModel.getBoxLength() != 0){
                     while (true){
-                        if (!boxModel.moveJudge(mapModel, scoresModel, maxScores, sinceScores)){
+                        if (!boxModel.moveJudge(mapModel, scoresModel, maxScores, sinceScores, soundPoolUtil)){
                             break;
                         }
                     }
@@ -224,7 +228,7 @@ public class GameController implements View.OnClickListener {
             SPEED = 1000;
         }
         speedBtn.invalidate();
-        Log.e("Speed", SPEED+"");
+//        Log.e("Speed", SPEED+"");
     }
 
 
@@ -251,6 +255,7 @@ public class GameController implements View.OnClickListener {
         start = activity.findViewById(R.id.start);
         lineGuide = activity.findViewById(R.id.openGuideLine);
         speedBtn = activity.findViewById(R.id.speed);
+        soundPoolUtil = new SoundPoolUtil(activity);
     }
 
     //2. 初始化游戏视图
